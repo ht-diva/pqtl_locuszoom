@@ -1,0 +1,55 @@
+# import required libraries
+from snakemake.utils import min_version
+
+##### set minimum snakemake version #####
+min_version("8.4.1")
+
+# read the configuration file
+configfile: "conf/config.yaml"
+
+include: "rules/common.smk"
+
+rule all:
+    input: expand("results/ld_{seqid}", seqid = lb.phenotype_id),
+
+
+rule compute_ld:
+    input:
+        loci="/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/seq.4407.10/break/{seqid}_loci.csv",
+    output:
+        ofile = "results/ld_{seqid}",
+    params:
+        #loci = get_locus,
+        bfile = config["genotype"],
+    resources:
+        runtime=lambda wc, attempt: 120 + attempt * 60,
+    shell:
+        """
+    loci_list={input.loci};
+    
+    while IFS=, read -r col1 col2 col3 col4 col5 col6_onwards; do
+        chr=$col1
+        beg=$col2
+        end=$col3
+        snp=$col5
+        loc=${{col1}}_${{col2}}_${{col3}}
+
+        if [[ "$chr" != "chr" ]]; then
+        
+            echo "Coordinates: ${{loc}}"
+        
+            plink   \
+            --bfile  {params.bfile}"$chr"  \
+            --keep-allele-order \
+            --ld-snp "$snp" \
+            --chr "$chr" --from-bp "$beg" --to-bp "$end" \
+            --r2  \
+            --ld-window 99999  \
+            --ld-window-r2 0  \
+            --out {output.ofile}_chr"$loc"  \
+            --threads 8  \
+            --memory 16000
+        fi
+
+    done < "$loci_list"
+"""
