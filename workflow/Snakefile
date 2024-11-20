@@ -10,7 +10,7 @@ configfile: "conf/config.yaml"
 include: "rules/common.smk"
 
 rule all:
-    input: expand("results/ld_reshaped/{seqid}", seqid = lb.phenotype_id),
+    input: expand("results/ld_reshaped/{seqid}.sentinel", seqid = lb.phenotype_id),
 
 
 rule compute_ld:
@@ -18,6 +18,7 @@ rule compute_ld:
         loci="/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/seq.4407.10/break/{seqid}_loci.csv",
     output:
         ofile = "results/ld/{seqid}",
+        sentinel = "results/ld/{seqid}.sentinel"
     params:
         #loci = get_locus,
         bfile = config["genotype"],
@@ -49,9 +50,12 @@ rule compute_ld:
             --out {output.ofile}_chr"$loc"  \
             --threads 8  \
             --memory 16000
-        fi
 
+            echo "====================================================================="
+        fi
+    
     done < "$loci_list"
+    touch {output.sentinel}
 """
 
 
@@ -61,13 +65,14 @@ rule reshape_ld:
         ld="results/ld/{seqid}",
     output:
         ofile = "results/ld_reshaped/{seqid}",
+        sentinel= "results/ld_reshaped/{seqid}.sentinel"
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
     shell:
         """
     loci_list={input.loci};
-    ifile=echo {input.loci}
-
+    ifile=$(echo {input.loci})
+    ofile=$(echo {output.ofile})
 
     while IFS=, read -r col1 col2 col3 col4_onwards; do
 
@@ -93,10 +98,10 @@ rule reshape_ld:
                 awk '{{print $6"\t"$3"\t"$7"\t"$7}}' OFS="\t" | \                  
                 sed -e '1s/SNP_B/snp1/' -e '1s/SNP_A/snp2/' -e '1s/R2/dprime/' -e '1s/R2/rsquare/'  | \ 
                 sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\1_\2\/\3/g' > ${{ld_tidy}}
+            
+            echo "====================================================================="
         fi
 
     done < "$loci_list"
-    echo "====================================================================="
+    touch {output.sentinel}
         """
-
-
