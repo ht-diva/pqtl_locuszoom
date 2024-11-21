@@ -10,18 +10,21 @@ configfile: "conf/config.yaml"
 include: "rules/common.smk"
 
 rule all:
-    input: expand("results/ld_reshaped/{seqid}.sentinel", seqid = lb.phenotype_id),
+    input: 
+        expand("results/ld/{seqid}.sentinel", seqid = lb.phenotype_id),
+        expand("results/ld_reshaped/{seqid}.sentinel", seqid = lb.phenotype_id),
+        #expand("results/plot/{seqid}.sentinel", seqid = lb.phenotype_id),
 
 
 rule compute_ld:
     input:
         loci="/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/seq.4407.10/break/{seqid}_loci.csv",
     output:
-        ofile = "results/ld/{seqid}",
         sentinel = "results/ld/{seqid}.sentinel"
     params:
         #loci = get_locus,
         bfile = config["genotype"],
+        ofile = "results/ld/{seqid}",
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
     shell:
@@ -47,7 +50,7 @@ rule compute_ld:
             --r2  \
             --ld-window 99999  \
             --ld-window-r2 0  \
-            --out {output.ofile}_chr"$loc"  \
+            --out {params.ofile}_chr"$loc"  \
             --threads 8  \
             --memory 16000
 
@@ -61,18 +64,19 @@ rule compute_ld:
 
 rule reshape_ld:
     input:
-        loci="/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/seq.4407.10/break/{seqid}_loci.csv",
-        ld="results/ld/{seqid}",
+        loci = "/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/seq.4407.10/break/{seqid}_loci.csv",
     output:
+        sentinel = "results/ld_reshaped/{seqid}.sentinel",
+    params:
         ofile = "results/ld_reshaped/{seqid}",
-        sentinel= "results/ld_reshaped/{seqid}.sentinel"
+        ld ="results/ld/{seqid}",
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
     shell:
         """
     loci_list={input.loci};
-    ifile=$(echo {input.loci})
-    ofile=$(echo {output.ofile})
+    ifile=$(echo {params.ld})
+    ofile=$(echo {params.ofile})
 
     while IFS=, read -r col1 col2 col3 col4_onwards; do
 
@@ -87,21 +91,17 @@ rule reshape_ld:
             echo "file name is: ${{ld_messi}}"
             
             # Here reshapes plink LD file to the desired structure by LZ (https://genome.sph.umich.edu/wiki/LocusZoom_Standalone#User-supplied_LD)
-            # L1. input file is the output of plink1 for a 1-to-all combinations of the SNPs within a region
-            # L2. awk remove spaces from the input file and make it tab-separated
-            # L3. awk reordering 4 required columns of LD file for LZ; rsquare was duplicated to replace with dprime -> Snakemake cannot interpret square bracet; it confilcts with internal SMK variable.
-            # L4. sed -e changing headers to snp1 (aby snp in the region), snp2 (reference snp), D` and R2 (LD measures)
-            # L5. sed -E converting SNP id from chr:pos:ref:alt to  chr:pos_ref/alt to allow merge with annotation in LZ sqlite database
+            # First awk takes input, output of plink1 for a 1-to-all combinations of the SNPs within a region, and
+            # removes white spaces from columns and make it tab-separated.
+            # Second awk reorders 4 required columns of LD file for LZ after after duplicating rsquare to replace with dprime -> Note: Snakemake cannot interpret square bracet; it confilcts with internal SMK variable and retuens error once making DAG of jobs.
+            # First sed -e changes headers to snp1 (aby snp in the region), snp2 (reference snp), D` and R2 (LD measures)
+            # Second sed -E converts SNP id from chr:pos:ref:alt to chr:pos_ref/alt to allow merge with annotation in LZ sqlite database
 
-            cat ${{ld_messi}} | \                                 
-                awk -v OFS="\t" '$1=$1' | \
-                awk '{{print $6"\t"$3"\t"$7"\t"$7}}' OFS="\t" | \                  
-                sed -e '1s/SNP_B/snp1/' -e '1s/SNP_A/snp2/' -e '1s/R2/dprime/' -e '1s/R2/rsquare/'  | \ 
-                sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\1_\2\/\3/g' > ${{ld_tidy}}
-            
-            echo "====================================================================="
+            awk -v OFS="\t" '$1=$1' $ld_messi | awk '{{print $6"\t"$3"\t"$7"\t"$7}}' OFS="\t"  |  sed -e '1s/SNP_B/snp1/' -e '1s/SNP_A/snp2/' -e '1s/R2/dprime/' -e '1s/R2/rsquare/'  |  sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g'  >  $ld_tidy                  
+
+            echo "=====================================================================\n\n"
         fi
 
     done < "$loci_list"
-    touch {output.sentinel}
+    touch {output.sentinel} # create a sentinel file to link this rule to the next one
         """
