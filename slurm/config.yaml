@@ -26,6 +26,12 @@ default-resources:
 
 set-resources:
     compute_ld:
-        mem_mb: 8000 + attempt * 2048
+        mem_mb: 2000 + attempt * 2048
         threads: *cores
         disk_mb: 8000 + attempt * 2048
+    reshape_ld:
+        mem_mb: 512 + attempt * 2048
+        threads: *cores
+        disk_mb: 8000 + attempt * 2048
+    draw_plot:
+        mem_mb: 2000 + attempt * 2048
