@@ -15,7 +15,7 @@ all:
 
 dag:
 	source $(CONDA_ENV_DIR)/activate $(CONDA_ENV_NAME) && \
-	snakemake --dag | dot -Tsvg > dag.svg
+	snakemake --dag | dot -Tpng > dag.png
 
 dependencies:
 	mamba env update -n snakemake --file environment.yml
