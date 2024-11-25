@@ -11,14 +11,12 @@ include: "rules/common.smk"
 
 rule all:
     input: 
-        expand("results/ld/{seqid}.sentinel", seqid = lb.phenotype_id),
-        expand("results/ld_reshaped/{seqid}.sentinel", seqid = lb.phenotype_id),
-        #expand("results/plot/{seqid}.sentinel", seqid = lb.phenotype_id),
+        expand("results/plot/{seqid}.sentinel", seqid = lb.phenotype_id),
 
 
 rule compute_ld:
     input:
-        loci="/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/seq.4407.10/break/{seqid}_loci.csv",
+        loci="/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/meta_filtered/break/{seqid}_loci.csv",
     output:
         sentinel = "results/ld/{seqid}.sentinel"
     params:
@@ -64,17 +62,18 @@ rule compute_ld:
 
 rule reshape_ld:
     input:
-        loci = "/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/seq.4407.10/break/{seqid}_loci.csv",
+        sentinel = "results/ld/{seqid}.sentinel",
     output:
         sentinel = "results/ld_reshaped/{seqid}.sentinel",
     params:
+        loci = "/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/meta_filtered/break/{seqid}_loci.csv",
         ofile = "results/ld_reshaped/{seqid}",
         ld ="results/ld/{seqid}",
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
     shell:
         """
-    loci_list={input.loci};
+    loci_list={params.loci};
     ifile=$(echo {params.ld})
     ofile=$(echo {params.ofile})
 
