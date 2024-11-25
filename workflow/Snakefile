@@ -11,18 +11,18 @@ include: "rules/common.smk"
 
 rule all:
     input: 
-        expand("results/plot/{seqid}.sentinel", seqid = lb.phenotype_id),
+        expand(str(Path(config.get("path_out"), "plot/{seqid}.sentinel")), seqid = lb.phenotype_id),
 
 
 rule compute_ld:
     input:
-        loci="/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/meta_filtered/break/{seqid}_loci.csv",
+        loci = str(Path(config.get("locus_file"), "break/{seqid}_loci.csv")),
     output:
-        sentinel = "results/ld/{seqid}.sentinel"
+        sentinel = str(Path(config.get("path_out"), "ld/{seqid}.sentinel")),
     params:
         #loci = get_locus,
         bfile = config["genotype"],
-        ofile = "results/ld/{seqid}",
+        ofile = str(Path(config.get("path_out"), "ld/{seqid}")),
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
     shell:
@@ -62,13 +62,13 @@ rule compute_ld:
 
 rule reshape_ld:
     input:
-        sentinel = "results/ld/{seqid}.sentinel",
+        sentinel = str(Path(config.get("path_out"), "ld/{seqid}.sentinel")),
     output:
-        sentinel = "results/ld_reshaped/{seqid}.sentinel",
+        sentinel = str(Path(config.get("path_out"), "ld_reshaped/{seqid}.sentinel")),
     params:
-        loci = "/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/meta_filtered/break/{seqid}_loci.csv",
-        ofile = "results/ld_reshaped/{seqid}",
-        ld ="results/ld/{seqid}",
+        loci = str(Path(config.get("locus_file"), "break/{seqid}_loci.csv")),
+        ofile = str(Path(config.get("path_out"), "ld_reshaped/{seqid}")),
+        ld = str(Path(config.get("path_out"), "ld/{seqid}")),
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
     shell:
@@ -108,13 +108,14 @@ rule reshape_ld:
 rule draw_plot:
     input:
         gwas = str(Path(config.get("gwas_file"), "{seqid}/{seqid}.gwaslab.tsv.bgz")),
-        sentinel = "results/ld_reshaped/{seqid}.sentinel",
+        sentinel = str(Path(config.get("path_out"), "ld_reshaped/{seqid}.sentinel")),
     output:
-        sentinel = "results/plot/{seqid}.sentinel",
+        sentinel =str(Path(config.get("path_out"), "plot/{seqid}.sentinel")),
     params:
-        loci = "/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/meta_filtered/break/{seqid}_loci.csv",
-        ofile = "results/plot/{seqid}",
-        ld = "results/ld_reshaped/{seqid}",
+        loci = str(Path(config.get("locus_file"), "break/{seqid}_loci.csv")),
+        ofile = str(Path(config.get("path_out"), "plot/{seqid}.sentinel")),
+        outdir = str(Path(config.get("path_out"), "plot")),
+        ld = str(Path(config.get("path_out"), "ld_reshaped/{seqid}")),
         seqid = "{seqid}"
     #conda:
     #    "envs/environment.yml"
@@ -166,8 +167,8 @@ rule draw_plot:
                     --prefix $prefix
             
             # moving plots to the output directory
-            mkdir -p results/plot/
-            mv ${{prefix}}* results/plot/
+            mkdir -p {params.outdir}
+            mv ${{prefix}}* {params.outdir}
             
             echo "=====================================================================\n\n"
         fi
