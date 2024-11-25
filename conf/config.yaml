@@ -1,10 +1,4 @@
-gwas_file: "/exchange/healthds/pQTL/results/META_CHRIS_INTERVAL/qced_sumstats_digits_not_flipped_filtered/output/${seq}/${seq}.gwaslab.tsv.bgz"
+gwas_file: "/exchange/healthds/pQTL/results/META_CHRIS_INTERVAL/qced_sumstats_digits_not_flipped_filtered/output"
 genotype: "/scratch/giulia.pontali/genomics_QC_pipeline/results_scratch/bed/qc_recoded_harmonised/impute_recoded_selected_sample_filter_hq_var_new_id_alleles_"
-locus_file: "/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/meta_filtered/break/${seq}_loci.csv"
-lb_file: "/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/seq.4407.10/break/collected_loci_excluding_mhc.csv"
-
-chr: 4
-beg: 99658253
-end: 99839056
-snp: "4:99771276:C:G"
-seq: "seq.17396.23"
+lb_file: "/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/seq.4407.10/break/collected_loci_153_seqid_distinct_loci.csv"
+locus_file: "/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/meta_filtered/break/"
