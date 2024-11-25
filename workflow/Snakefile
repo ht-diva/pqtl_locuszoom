@@ -104,3 +104,74 @@ rule reshape_ld:
     done < "$loci_list"
     touch {output.sentinel} # create a sentinel file to link this rule to the next one
         """
+
+rule draw_plot:
+    input:
+        gwas = str(Path(config.get("gwas_file"), "{seqid}/{seqid}.gwaslab.tsv.bgz")),
+        sentinel = "results/ld_reshaped/{seqid}.sentinel",
+    output:
+        sentinel = "results/plot/{seqid}.sentinel",
+    params:
+        loci = "/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/meta_filtered/break/{seqid}_loci.csv",
+        ofile = "results/plot/{seqid}",
+        ld = "results/ld_reshaped/{seqid}",
+        seqid = "{seqid}"
+    #conda:
+    #    "envs/environment.yml"
+    resources:
+        runtime=lambda wc, attempt: 120 + attempt * 60,
+    shell:
+        """
+    loci_list={params.loci};
+    ifile=$(echo {params.ld})
+    ofile=$(echo {params.ofile})
+    seq=$(echo {params.seqid})
+
+    source /exchange/healthds/singularity_functions
+
+    while IFS=, read -r col1 col2 col3 col4 col5 col6_onwards; do
+        chr=$col1
+        beg=$col2
+        end=$col3
+        snp=$col5
+        target=$(echo $snp | sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g')
+        loc=${{col1}}_${{col2}}_${{col3}}
+        region=${{col1}}:${{col2}}-${{col3}}
+        ld=${{ifile}}_chr${{loc}}.ld
+        prefix=${{seq}}_chr${{loc}}
+
+        #${{ofile}}_chr${{loc}}
+        echo "target is: $target"
+        echo "region is: $region"
+        echo "ld file is: $ld"
+        echo "prefix is: $prefix"
+
+        if [[ "$chr" != "chr" ]]; then
+        
+            echo "Coordinates: ${{loc}}"
+
+            tabix  {input.gwas} $region -h | \
+                sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g' | \
+                locuszoom  \
+                    --metal - \
+                    --markercol SNPID \
+                    --pvalcol MLOG10P \
+                    --no-transform \
+                    --refsnp $target \
+                    --flank 500kbp \
+                    --build hg19 \
+                    --ld $ld \
+                    --ld-measure rsquare \
+                    --plotonly \
+                    --prefix $prefix
+            
+            # moving plots to the output directory
+            mkdir -p results/plot/
+            mv ${{prefix}}* results/plot/
+            
+            echo "=====================================================================\n\n"
+        fi
+        
+    done < "$loci_list"
+    touch {output.sentinel}
+        """
