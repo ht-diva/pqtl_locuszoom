@@ -11,18 +11,18 @@ include: "rules/common.smk"
 
 rule all:
     input: 
-        expand(str(Path(config.get("path_out"), "plot/{seqid}.sentinel")), seqid = lb.phenotype_id),
+        expand(ws_path("plot/{seqid}.sentinel"), seqid = lb.phenotype_id),
 
 
 rule compute_ld:
     input:
         loci = str(Path(config.get("locus_file"), "break/{seqid}_loci.csv")),
     output:
-        sentinel = str(Path(config.get("path_out"), "ld/{seqid}.sentinel")),
+        sentinel = ws_path("ld/{seqid}.sentinel"),
     params:
         #loci = get_locus,
         bfile = config["genotype"],
-        ofile = str(Path(config.get("path_out"), "ld/{seqid}")),
+        ofile = ws_path("ld/{seqid}"),
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
     shell:
@@ -62,13 +62,13 @@ rule compute_ld:
 
 rule reshape_ld:
     input:
-        sentinel = str(Path(config.get("path_out"), "ld/{seqid}.sentinel")),
+        sentinel = ws_path("ld/{seqid}.sentinel"),
     output:
-        sentinel = str(Path(config.get("path_out"), "ld_reshaped/{seqid}.sentinel")),
+        sentinel = ws_path("ld_reshaped/{seqid}.sentinel"),
     params:
         loci = str(Path(config.get("locus_file"), "break/{seqid}_loci.csv")),
-        ofile = str(Path(config.get("path_out"), "ld_reshaped/{seqid}")),
-        ld = str(Path(config.get("path_out"), "ld/{seqid}")),
+        ofile = ws_path("ld_reshaped/{seqid}"),
+        ld = ws_path("ld/{seqid}"),
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
     shell:
@@ -107,15 +107,15 @@ rule reshape_ld:
 
 rule draw_plot:
     input:
-        gwas = str(Path(config.get("gwas_file"), "{seqid}/{seqid}.gwaslab.tsv.bgz")),
-        sentinel = str(Path(config.get("path_out"), "ld_reshaped/{seqid}.sentinel")),
+        gwas = gwas_path("{seqid}/{seqid}.gwaslab.tsv.bgz"),
+        sentinel = ws_path("ld_reshaped/{seqid}.sentinel"),
     output:
-        sentinel =str(Path(config.get("path_out"), "plot/{seqid}.sentinel")),
+        sentinel = ws_path("plot/{seqid}.sentinel"),
     params:
         loci = str(Path(config.get("locus_file"), "break/{seqid}_loci.csv")),
-        ofile = str(Path(config.get("path_out"), "plot/{seqid}.sentinel")),
-        outdir = str(Path(config.get("path_out"), "plot")),
-        ld = str(Path(config.get("path_out"), "ld_reshaped/{seqid}")),
+        ofile = ws_path("plot/{seqid}.sentinel"),
+        outdir = ws_path("plot"),
+        ld = ws_path("ld_reshaped/{seqid}"),
         seqid = "{seqid}"
     #conda:
     #    "envs/environment.yml"
