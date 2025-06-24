@@ -159,7 +159,8 @@ rule draw_plot:
                     --pvalcol MLOG10P \
                     --no-transform \
                     --refsnp $target \
-                    --flank 500kbp \
+                    --start $beg \
+                    --end $end \
                     --build hg19 \
                     --ld $ld \
                     --ld-measure rsquare \
