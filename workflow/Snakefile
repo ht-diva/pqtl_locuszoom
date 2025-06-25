@@ -11,7 +11,7 @@ include: "rules/common.smk"
 
 rule all:
     input: 
-        expand(ws_path("ld_reshaped/{locuseq}.ld"), locuseq = my_lb.locuseq),
+        expand(ws_path("plot/{locuseq}.sentinel"), locuseq = my_lb.locuseq),
 
 
 rule compute_ld:
@@ -27,7 +27,7 @@ rule compute_ld:
         """
         echo "Coordinates: {params.locus}"
 
-        # teh index variant for pairwise ld computation
+        # the index variant for pairwise ld computation
         snp={params.lead}
 
         # take region bounaries from locus string
@@ -78,73 +78,70 @@ rule reshape_ld:
 
 rule draw_plot:
     input:
-        gwas = gwas_path("{seqid}/{seqid}.gwaslab.tsv.bgz"),
-        sentinel = ws_path("ld_reshaped/{seqid}.sentinel"),
+        ld = ws_path("ld_reshaped/{locuseq}.ld"),
+        gwas  = lambda wildcards: get_gwas(wildcards.locuseq),
     output:
-        sentinel = ws_path("plot/{seqid}.sentinel"),
+        sentinel = ws_path("plot/{locuseq}.sentinel"),
     params:
-        loci = str(Path(config.get("locus_file"), "break/{seqid}_loci.csv")),
-        ofile = ws_path("plot/{seqid}.sentinel"),
+        locus = lambda wildcards: get_locus(wildcards.locuseq),
+        lead  = lambda wildcards: get_snp(wildcards.locuseq),
+        prefix = "{locuseq}",
         outdir = ws_path("plot"),
-        ld = ws_path("ld_reshaped/{seqid}"),
-        seqid = "{seqid}"
+        tail = config.get("options").get("extn_window"),
+        plab = config.get("options").get("plab"),
+        snplab = config.get("options").get("snplab"),
+        build = config.get("options").get("build"),
+        measure = config.get("options").get("ld_measure"),
+        recomb = config.get("options").get("show_recomb"),
     #conda:
     #    "envs/environment.yml"
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
     shell:
         """
-    loci_list={params.loci};
-    ifile=$(echo {params.ld})
-    ofile=$(echo {params.ofile})
-    seq=$(echo {params.seqid})
+        echo "Genomic region: {params.locus}"
+       
+        # index variant need to be formated readable for locuszoom 
+        target=$(echo {params.lead} | sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g')
 
-    source /exchange/healthds/singularity_functions
+        # take region bounaries from locus string
+        chr=$(echo {params.locus} | cut -d'_' -f1)
+        beg=$(echo {params.locus} | cut -d'_' -f2)
+        end=$(echo {params.locus} | cut -d'_' -f3)
+        
+        # extend the boundaries by +/- 100 kbp
+        beg_ext=$((beg - {params.tail}))
+        end_ext=$((end + {params.tail}))
+        
+        # reformat locus to be readable for locuzoom
+        region=${{chr}}:${{beg_ext}}-${{end_ext}}
+        
+        source /exchange/healthds/singularity_functions
 
-    while IFS=, read -r col1 col2 col3 col4 col5 col6_onwards; do
-        chr=$col1
-        beg=$col2
-        end=$col3
-        snp=$col5
-        target=$(echo $snp | sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g')
-        loc=${{col1}}_${{col2}}_${{col3}}
-        region=${{col1}}:${{col2}}-${{col3}}
-        ld=${{ifile}}_chr${{loc}}.ld
-        prefix=${{seq}}_chr${{loc}}
-
-        #${{ofile}}_chr${{loc}}
         echo "target is: $target"
         echo "region is: $region"
-        echo "ld file is: $ld"
-        echo "prefix is: $prefix"
 
-        if [[ "$chr" != "chr" ]]; then
-        
-            echo "Coordinates: ${{loc}}"
-
-            tabix  {input.gwas} $region -h | \
-                sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g' | \
+        tabix  {input.gwas} $region -h | \
+            sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g' | \
                 locuszoom  \
                     --metal - \
-                    --markercol SNPID \
-                    --pvalcol MLOG10P \
+                    --markercol {params.snplab} \
+                    --pvalcol {params.plab} \
                     --no-transform \
                     --refsnp $target \
-                    --start $beg \
-                    --end $end \
-                    --build hg19 \
-                    --ld $ld \
-                    --ld-measure rsquare \
-                    --plotonly \
-                    --prefix $prefix
+                    --start $beg_ext \
+                    --end $end_ext \
+                    --build {params.build} \
+                    --svg  \
+                    --ld {input.ld} \
+                    --ld-measure {params.measure} \
+                    --plotonly  \
+                    showRecomb={params.recomb} \
+                    --prefix {params.prefix}
             
-            # moving plots to the output directory
-            mkdir -p {params.outdir}
-            mv ${{prefix}}* {params.outdir}
-            
-            echo "=====================================================================\n\n"
-        fi
-        
-    done < "$loci_list"
-    touch {output.sentinel}
+        # moving plots to the output directory
+        mkdir -p {params.outdir}
+        mv {params.prefix}* {params.outdir}
+
+        touch {output.sentinel}
         """
