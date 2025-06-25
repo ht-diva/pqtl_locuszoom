@@ -11,7 +11,7 @@ include: "rules/common.smk"
 
 rule all:
     input: 
-        expand(ws_path("ld/{locuseq}.ld"), locuseq = my_lb.locuseq),
+        expand(ws_path("ld_reshaped/{locuseq}.ld"), locuseq = my_lb.locuseq),
 
 
 rule compute_ld:
@@ -56,50 +56,24 @@ rule compute_ld:
             --memory 16000
         """
 
+# Here reshapes plink LD file to the desired structure by LZ (https://genome.sph.umich.edu/wiki/LocusZoom_Standalone#User-supplied_LD)
+# First awk takes input, output of plink1 for a 1-to-all combinations of the SNPs within a region, and
+# removes white spaces from columns and make it tab-separated.
+# Second awk reorders 4 required columns of LD file for LZ after duplicating rsquare to replace with dprime -> 
+# Note: Snakemake cannot interpret square bracet; it confilcts with internal SMK variable and retuens error once making DAG of jobs.
+# First sed -e changes headers to snp1 (aby snp in the region), snp2 (reference snp), D` and R2 (LD measures)
+# Second sed -E converts SNP id from chr:pos:ref:alt to chr:pos_ref/alt to allow merge with annotation in LZ sqlite database
 
 rule reshape_ld:
     input:
-        sentinel = ws_path("ld/{seqid}.sentinel"),
+        ld = ws_path("ld/{locuseq}.ld"),
     output:
-        sentinel = ws_path("ld_reshaped/{seqid}.sentinel"),
-    params:
-        loci = str(Path(config.get("locus_file"), "break/{seqid}_loci.csv")),
-        ofile = ws_path("ld_reshaped/{seqid}"),
-        ld = ws_path("ld/{seqid}"),
+        ofile = ws_path("ld_reshaped/{locuseq}.ld"),
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
     shell:
         """
-    loci_list={params.loci};
-    ifile=$(echo {params.ld})
-    ofile=$(echo {params.ofile})
-
-    while IFS=, read -r col1 col2 col3 col4_onwards; do
-
-        chr=$col1
-        loc=${{col1}}_${{col2}}_${{col3}}
-        ld_messi=${{ifile}}_chr${{loc}}.ld
-        ld_tidy="${{ofile}}"_chr${{loc}}.ld
-
-        if [[ "$chr" != "chr" ]]; then
-        
-            echo "Coordinates: ${{loc}}"
-            echo "file name is: ${{ld_messi}}"
-            
-            # Here reshapes plink LD file to the desired structure by LZ (https://genome.sph.umich.edu/wiki/LocusZoom_Standalone#User-supplied_LD)
-            # First awk takes input, output of plink1 for a 1-to-all combinations of the SNPs within a region, and
-            # removes white spaces from columns and make it tab-separated.
-            # Second awk reorders 4 required columns of LD file for LZ after after duplicating rsquare to replace with dprime -> Note: Snakemake cannot interpret square bracet; it confilcts with internal SMK variable and retuens error once making DAG of jobs.
-            # First sed -e changes headers to snp1 (aby snp in the region), snp2 (reference snp), D` and R2 (LD measures)
-            # Second sed -E converts SNP id from chr:pos:ref:alt to chr:pos_ref/alt to allow merge with annotation in LZ sqlite database
-
-            awk -v OFS="\t" '$1=$1' $ld_messi | awk '{{print $6"\t"$3"\t"$7"\t"$7}}' OFS="\t"  |  sed -e '1s/SNP_B/snp1/' -e '1s/SNP_A/snp2/' -e '1s/R2/dprime/' -e '1s/R2/rsquare/'  |  sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g'  >  $ld_tidy                  
-
-            echo "=====================================================================\n\n"
-        fi
-
-    done < "$loci_list"
-    touch {output.sentinel} # create a sentinel file to link this rule to the next one
+        awk -v OFS="\t" '$1=$1' {input.ld} | awk '{{print $6"\t"$3"\t"$7"\t"$7}}' OFS="\t"  |  sed -e '1s/SNP_B/snp1/' -e '1s/SNP_A/snp2/' -e '1s/R2/dprime/' -e '1s/R2/rsquare/'  |  sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g'  >  {output.ofile}           
         """
 
 rule draw_plot:
