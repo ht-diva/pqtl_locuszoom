@@ -30,3 +30,10 @@ def get_gwas(wildcards):
     seqid = my_lb.loc[wildcards, "phenotype_id"]
     file_path = f"{seqid}/{seqid}.gwaslab.tsv.bgz"
     return str(Path(config.get("path_gwas"), file_path))
+
+# funtion creating the path toward conditional RDS file
+def get_rds(wildcards):
+    seqid = my_lb.loc[wildcards, "phenotype_id"]
+    locus = my_lb.loc[wildcards, "locus"]
+    rds_path = f"cojo/{seqid}/conditional_data_{locus}.rds"
+    return str(Path(config.get("path_rds"), rds_path))
