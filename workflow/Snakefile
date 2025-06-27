@@ -11,7 +11,20 @@ include: "rules/common.smk"
 
 rule all:
     input: 
-        expand(ws_path("plot/{locuseq}.sentinel"), locuseq = my_lb.locuseq),
+        expand(ws_path("data/{locuseq}.tsv"), locuseq = my_lb.locuseq),
+
+
+rule take_data:
+    input:
+        cond_rds = lambda wildcards: get_rds(wildcards.locuseq),
+    output:
+        ofile = ws_path("data/{locuseq}.tsv")
+    params:
+        cojo_snp = lambda wildcards: get_snp(wildcards.locuseq),
+    conda:
+       "envs/environment.yml"
+    script:
+        "scripts/grep_data.R"
 
 
 rule compute_ld:
