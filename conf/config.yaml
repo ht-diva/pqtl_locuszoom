@@ -1,5 +1,6 @@
 path_gwas: "/exchange/healthds/pQTL/results/META_CHRIS_INTERVAL/qced_sumstats_digits_not_flipped_filtered/output"
 genotype: "/scratch/giulia.pontali/genomics_QC_pipeline/results_scratch/bed/qc_recoded_harmonised/impute_recoded_selected_sample_filter_hq_var_new_id_alleles_"
+path_rds: "/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/meta_correct_sdy"
 lb_file: "/scratch/dariush.ghasemi/projects/pqtl_locuszoom/coloc_loci.csv"
 path_out: "results/test"
 
