@@ -22,7 +22,7 @@ k <- which(df_rds$ind.snps$SNP == cojo_snp)
 # only pick columns needed as like a METAL input for LZ standalone
 df_cond <- df_rds$results[[k]] %>%
   dplyr::select(
-    CHROM = Chr,
+    `##CHR` = Chr,
     POS = bp,
     SNPID = SNP,
     MAF = freq,
@@ -30,7 +30,8 @@ df_cond <- df_rds$results[[k]] %>%
     SE = se,
     N = n,
     MLOG10P = mlog10pC
-  )
+  ) %>%
+  arrange(POS)
 
 
 # save reformatted conditional data
