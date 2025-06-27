@@ -11,7 +11,7 @@ include: "rules/common.smk"
 
 rule all:
     input: 
-        expand(ws_path("data/{locuseq}.tsv.bgz"), locuseq = my_lb.locuseq),
+        expand(ws_path("plot_cond/{locuseq}.sentinel"), locuseq = my_lb.locuseq),
 
 
 rule take_data:
@@ -106,14 +106,14 @@ rule reshape_ld:
 rule draw_plot:
     input:
         ld = ws_path("ld_reshaped/{locuseq}.ld"),
-        gwas  = lambda wildcards: get_gwas(wildcards.locuseq),
+        gwas = ws_path("data/{locuseq}.tsv.bgz"),
     output:
-        sentinel = ws_path("plot/{locuseq}.sentinel"),
+        sentinel = ws_path("plot_cond/{locuseq}.sentinel"),
     params:
         locus = lambda wildcards: get_locus(wildcards.locuseq),
         lead  = lambda wildcards: get_snp(wildcards.locuseq),
         prefix = "{locuseq}",
-        outdir = ws_path("plot"),
+        outdir = ws_path("plot_cond"),
         tail = config.get("options").get("extn_window"),
         plab = config.get("options").get("plab"),
         snplab = config.get("options").get("snplab"),
