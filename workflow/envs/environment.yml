@@ -6,11 +6,11 @@ channels:
   - R
 dependencies:
   - r-base=4.3.3
-  - BiocManager=1.30.25
-  - ensembldb=2.30.0
-  - locuszoomr=0.3.5
-  - EnsDb.Hsapiens.v75=2.99.0
-  - r-optparse=1.7.4
+#  - BiocManager=1.30.25
+#  - ensembldb=2.30.0
+#  - locuszoomr=0.3.5
+#  - EnsDb.Hsapiens.v75=2.99.0
+#  - r-optparse=1.7.4
   - r-tidyverse=2.0.0
   - r-data.table=1.15.2
   - r-R.utils=2.12.3
