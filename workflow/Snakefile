@@ -156,6 +156,7 @@ rule draw_plot:
                     --pvalcol {params.plab} \
                     --no-transform \
                     --refsnp $target \
+                    --chr $chr \
                     --start $beg_ext \
                     --end $end_ext \
                     --build {params.build} \
