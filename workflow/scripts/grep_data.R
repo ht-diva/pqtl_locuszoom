@@ -9,8 +9,6 @@ path_rds <- snakemake@input[["cond_rds"]]
 cojo_snp <- snakemake@params[["cojo_snp"]]
 ofile <- snakemake@output[["ofile"]]
 
-#"/scratch/dariush.ghasemi/projects/pqtl_pipeline_finemap/results/meta_correct_sdy/cojo/seq.8528.74/conditional_data_17_7063650_7173279.rds"
-#cojo_snp <- "17:7063667:C:T"
 
 # read conditional RDS file
 df_rds <- readRDS(path_rds)
