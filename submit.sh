@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name lzoom
-#SBATCH --output %j_lzoom_test.log
+#SBATCH --output %j_lzoom_alessia.log
 #SBATCH --partition cpuq
 #SBATCH --cpus-per-task 1
 #SBATCH --mem 4G

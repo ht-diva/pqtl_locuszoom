@@ -25,7 +25,7 @@ dev-dependencies: dependencies
 
 dry-run:
 	source $(CONDA_ENV_DIR)/activate $(CONDA_ENV_NAME) && \
-	snakemake --sdm conda --dry-run --profile slurm --snakefile workflow/Snakefile 
+	snakemake --sdm conda --dry-run --profile slurm --snakefile workflow/gwas_lz.smk 
 
 pre-commit:
 	source $(CONDA_ENV_DIR)/activate $(CONDA_ENV_NAME) && \
@@ -34,7 +34,7 @@ pre-commit:
 
 run:
 	source $(CONDA_ENV_DIR)/activate $(CONDA_ENV_NAME) && \
-	snakemake --profile slurm --snakefile workflow/Snakefile 
+	snakemake --profile slurm --snakefile workflow/gwas_lz.smk 
 
 rerun:
 	source $(CONDA_ENV_DIR)/activate $(CONDA_ENV_NAME) && \
@@ -42,7 +42,7 @@ rerun:
 
 unlock:
 	source $(CONDA_ENV_DIR)/activate $(CONDA_ENV_NAME) && \
-	snakemake --unlock
+	snakemake --unlock --snakefile workflow/gwas_lz.smk 
 
 dockerfile_:
 	source $(CONDA_ENV_DIR)/activate $(CONDA_ENV_NAME) && \
