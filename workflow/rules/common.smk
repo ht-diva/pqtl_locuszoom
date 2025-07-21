@@ -4,13 +4,15 @@ import pandas as pd
 # read loci list
 lb = pd.read_csv(config["lb_file"])
 
-# Create a new column by concatenating 
+# Create a new column by concatenating
+lb["snp"] = lb["SNPID"].str.replace(":", ".") # change colon with underscore in SNP identifers
 lb["locus"]  = lb["chr"].astype(str) + "_" + lb["start"].astype(str) + "_" + lb["end"].astype(str)
-lb["locuseq"] = lb["phenotype_id"].astype(str) + "_" + lb["locus"].astype(str)
+lb["locuseq"] = lb["phenotype_id"].astype(str) + "_" + lb["locus"].astype(str)+ "_" + lb["snp"].astype(str)
 
+# Use only needed columns
 my_lb = (
-    pd.DataFrame(lb, columns=["locuseq", "phenotype_id", "locus", "SNPID"])
-    #.drop_duplicates(subset='top_cond_ab')
+    pd.DataFrame(lb, columns=["locuseq", "phenotype_id", "locus", "SNPID", "snp"])
+    .drop_duplicates()
     .set_index("locuseq", drop=False)
     .sort_index()
 )
