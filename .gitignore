@@ -6,3 +6,4 @@ lzoom/
 seq.*
 workflow/scripts/locus_zoom.R
 workflow/scripts/locus_zoom.sh
+conf/*.csv
