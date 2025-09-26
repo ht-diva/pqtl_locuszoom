@@ -10,7 +10,7 @@ rule take_data:
     conda:
        "../envs/environment.yml"
     script:
-        "scripts/grep_data.R"
+        "../scripts/grep_data.R"
 
 
 rule index_data:
