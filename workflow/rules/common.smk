@@ -7,11 +7,11 @@ lb = pd.read_csv(config["lb_file"])
 # Create a new column by concatenating
 lb["snp"] = lb["SNPID"].str.replace(":", ".") # change colon with underscore in SNP identifers
 lb["locus"]  = lb["chr"].astype(str) + "_" + lb["start"].astype(str) + "_" + lb["end"].astype(str)
-lb["locuseq"] = lb["phenotype_id"].astype(str) + "_" + lb["locus"].astype(str)+ "_" + lb["snp"].astype(str)
+lb["locuseq"] = lb["seqid"].astype(str) + "_" + lb["locus"].astype(str)+ "_" + lb["snp"].astype(str)
 
 # Use only needed columns
 my_lb = (
-    pd.DataFrame(lb, columns=["locuseq", "phenotype_id", "locus", "SNPID", "snp"])
+    pd.DataFrame(lb, columns=["locuseq", "seqid", "locus", "SNPID", "snp"])
     .drop_duplicates()
     .set_index("locuseq", drop=False)
     .sort_index()
@@ -29,7 +29,7 @@ def ws_path(file_path):
     return str(Path(config.get("path_out"), file_path))
 
 def get_gwas(wildcards):
-    seqid = my_lb.loc[wildcards, "phenotype_id"]
+    seqid = my_lb.loc[wildcards, "seqid"]
     file_path = f"{seqid}/{seqid}.gwaslab.tsv.bgz"
     return str(Path(config.get("path_gwas"), file_path))
 

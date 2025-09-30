@@ -7,7 +7,8 @@ To inform the pipeline which regions to plot, please consider similar data struc
 - start
 - end
 - SNPID
-- MLOG10P in GWAS
+- MLOG10P
+- seqid
 
 
 ### Options
