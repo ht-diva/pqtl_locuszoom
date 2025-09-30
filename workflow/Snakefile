@@ -24,7 +24,7 @@ if config.get("run").get("conditional_plot"):
 else:
 
     include: "rules/prepare_ld.smk"
-    include: "rules/draw_plot.smk"
+    include: "rules/draw_plot_marginal.smk"
 
     rule all:
         input:
