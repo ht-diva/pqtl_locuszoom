@@ -15,4 +15,5 @@ To inform the pipeline which regions to plot, please consider similar data struc
 There are some options in the config:
 - show_recomb: TRUE/FALSE  --> FALSE skips showing the recombination line.
 - build: hg37/hg38  --> genomic build of the variants' coordinates
+- conditional_plot: False will draw regional association plot using marginal SNPs coefficients from GWAS results.
 [to be completed]
