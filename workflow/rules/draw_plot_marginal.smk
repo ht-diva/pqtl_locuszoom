@@ -16,6 +16,7 @@ rule draw_plot:
         build = config.get("options").get("build"),
         measure = config.get("options").get("ld_measure"),
         recomb = config.get("options").get("show_recomb"),
+        study = config.get("run").get("study"),
     #conda:
     #    "envs/environment.yml"
     resources:
@@ -44,7 +45,16 @@ rule draw_plot:
         echo "target is: $target"
         echo "region is: $region"
 
-        tabix  {input.gwas} $region -h | \
+        if [ {params.study} = "Believe" ]; then
+            CMD="cat header.txt <(tabix {input.gwas} $region)"
+        elif [ {params.study} = "Meta_Interval" ]; then
+            CMD="tabix {input.gwas} $region -h"
+        else
+            echo "ERROR: Unknown study {{params.study}}" >&2 
+            exit 1
+        fi
+
+        eval $CMD | \
             sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g' | \
                 locuszoom  \
                     --metal - \
