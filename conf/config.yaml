@@ -8,9 +8,10 @@ options:
     show_recomb: TRUE
     extn_window: 0
     ld_measure: rsquare
-    build: hg19
+    build: hg19 # for Meta_Interval, hg38 for Believe
     plab: MLOG10P
     snplab: SNPID
 
 run:
     conditional_plot: True
+    study: Meta_Interval  # or Believe
