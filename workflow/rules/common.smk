@@ -28,9 +28,18 @@ def get_snp(wildcards):
 def ws_path(file_path):
     return str(Path(config.get("path_out"), file_path))
 
+STUDY_SUFFIX = {
+    "Believe": ".gz",
+    "Meta_Interval": ".bgz",
+}
+
 def get_gwas(wildcards):
     seqid = my_lb.loc[wildcards, "seqid"]
-    file_path = f"{seqid}/{seqid}.gwaslab.tsv.bgz"
+    try:
+        suffix = STUDY_SUFFIX[config["run"]["study"]]
+    except KeyError:
+        raise ValueError(f"Unsupported study: {config.get('run').get('study')}")
+    file_path = f"{seqid}/{seqid}.gwaslab.tsv{suffix}"
     return str(Path(config.get("path_gwas"), file_path))
 
 # funtion creating the path toward conditional RDS file
