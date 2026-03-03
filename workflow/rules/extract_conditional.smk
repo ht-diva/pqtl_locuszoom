@@ -7,6 +7,7 @@ rule take_data:
         ofile = ws_path("data/{locuseq}.tsv")
     params:
         cojo_snp = lambda wildcards: get_snp(wildcards.locuseq),
+        region   = lambda wildcards: get_locus(wildcards.locuseq),
     conda:
        "../envs/environment.yml"
     script:
