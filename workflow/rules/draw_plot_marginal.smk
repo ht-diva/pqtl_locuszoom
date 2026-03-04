@@ -10,6 +10,7 @@ rule draw_plot:
         lead  = lambda wildcards: get_snp(wildcards.locuseq),
         prefix = "{locuseq}",
         outdir = ws_path("plot"),
+        header = config.get("header"),
         tail = config.get("options").get("extn_window"),
         plab = config.get("options").get("plab"),
         snplab = config.get("options").get("snplab"),
@@ -21,61 +22,5 @@ rule draw_plot:
     #    "envs/environment.yml"
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
-    shell:
-        """
-        echo "Genomic region: {params.locus}"
-       
-        # index variant need to be formated readable for locuszoom 
-        target=$(echo {params.lead} | sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g')
-
-        # take region bounaries from locus string
-        chr=$(echo {params.locus} | cut -d'_' -f1)
-        beg=$(echo {params.locus} | cut -d'_' -f2)
-        end=$(echo {params.locus} | cut -d'_' -f3)
-        
-        # extend the boundaries by +/- 100 kbp
-        beg_ext=$((beg - {params.tail}))
-        end_ext=$((end + {params.tail}))
-        
-        # reformat locus to be readable for locuzoom
-        region=${{chr}}:${{beg_ext}}-${{end_ext}}
-        
-        source /exchange/healthds/singularity_functions
-
-        echo "target is: $target"
-        echo "region is: $region"
-
-        if [ {params.study} = "Believe" ]; then
-            CMD="cat header.txt <(tabix {input.gwas} $region)"
-        elif [ {params.study} = "Meta_Interval" ]; then
-            CMD="tabix {input.gwas} $region -h"
-        else
-            echo "ERROR: Unknown study {{params.study}}" >&2 
-            exit 1
-        fi
-
-        eval $CMD | \
-            sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g' | \
-                locuszoom  \
-                    --metal - \
-                    --markercol {params.snplab} \
-                    --pvalcol {params.plab} \
-                    --no-transform \
-                    --refsnp $target \
-                    --chr $chr \
-                    --start $beg_ext \
-                    --end $end_ext \
-                    --build {params.build} \
-                    --svg  \
-                    --ld {input.ld} \
-                    --ld-measure {params.measure} \
-                    --plotonly  \
-                    showRecomb={params.recomb} \
-                    --prefix {params.prefix}
-            
-        # moving plots to the output directory
-        mkdir -p {params.outdir}
-        mv {params.prefix}* {params.outdir}
-
-        touch {output.sentinel}
-        """
+    script:
+        "../scripts/marginal_lz.sh"
