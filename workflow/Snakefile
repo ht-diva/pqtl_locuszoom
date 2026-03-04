@@ -15,7 +15,7 @@ if config.get("run").get("conditional_plot"):
 
     include: "rules/extract_conditional.smk"
     include: "rules/prepare_ld.smk"
-    include: "rules/draw_plot.smk"
+    include: "rules/draw_plot_conditional.smk"
 
     rule all:
         input:
