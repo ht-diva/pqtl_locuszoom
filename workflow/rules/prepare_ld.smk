@@ -8,38 +8,9 @@ rule compute_ld:
         bfile = config["genotype"],
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
-    shell:
-        """
-        echo "Coordinates: {params.locus}"
+    script:
+        "../scripts/pairwise_ld.sh"
 
-        # the index variant for pairwise ld computation
-        snp={params.lead}
-
-        # take region bounaries from locus string
-        chr=$(echo {params.locus} | cut -d'_' -f1)
-        beg=$(echo {params.locus} | cut -d'_' -f2)
-        end=$(echo {params.locus} | cut -d'_' -f3)
-
-        # remove ".ld" from ofile as plink add it by default
-        # in this way, SMK can detect ofile to prevent from missing output error
-        out_ld=$(echo {output.ld} | sed 's/.ld$//')
-
-        # extend the boundaries by +/-100 kbp
-        beg_ext=$((beg - 100000))
-        end_ext=$((end + 100000))
-
-        plink   \
-            --bfile  {params.bfile}"$chr"  \
-            --keep-allele-order \
-            --ld-snp "$snp" \
-            --chr "$chr" --from-bp "$beg_ext" --to-bp "$end_ext" \
-            --r2  \
-            --ld-window 99999  \
-            --ld-window-r2 0  \
-            --out "$out_ld"  \
-            --threads 8  \
-            --memory 16000
-        """
 
 # Here reshapes plink LD file to the desired structure by LZ (https://genome.sph.umich.edu/wiki/LocusZoom_Standalone#User-supplied_LD)
 # First awk takes input, output of plink1 for a 1-to-all combinations of the SNPs within a region, and
