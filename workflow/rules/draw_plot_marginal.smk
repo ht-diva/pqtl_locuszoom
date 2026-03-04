@@ -23,4 +23,4 @@ rule draw_plot:
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
     script:
-        "../scripts/marginal_lz.sh"
+        "../scripts/draw_lz.sh"
