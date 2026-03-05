@@ -21,9 +21,10 @@ RECOMB="${snakemake_params[recomb]}"
 source /exchange/healthds/singularity_functions
 
 echo "Genomic region: $LOCUS"
-       
+echo "LD reference: $LEAD"
+
 # index variant need to be formated readable for locuszoom 
-target=$(echo "$LEAD" | sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g')
+target=$(echo "$LEAD" | sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\1_\2\/\3/g')
 
 # take region bounaries from locus string
 chr=$(echo "$LOCUS" | cut -d'_' -f1)
@@ -35,10 +36,10 @@ beg_ext=$((beg - "$TAIL"))
 end_ext=$((end + "$TAIL"))
 
 # reformat locus to be readable for locuzoom
-region=${{chr}}:${{beg_ext}}-${{end_ext}}
+region="$chr":"$beg_ext"-"$end_ext"
 
-echo "target is: $target"
-echo "region is: $region"
+echo "Expanded region: $region"
+echo "Target SNP: $target"
 
 # specify which command to use for different study
 if [ "$STUDY" = "Believe" ]; then
@@ -51,7 +52,7 @@ else
 fi
 
 eval $CMD | \
-    sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\\1_\\2\/\\3/g' | \
+    sed -E 's/([0-9]+:[0-9]+):([A-Z]+):([A-Z]+)/\1_\2\/\3/g' | \
         locuszoom  \
             --metal - \
             --markercol "$SNPLAB" \
@@ -71,6 +72,7 @@ eval $CMD | \
     
 # moving plots to the output directory
 mkdir -p "$OUTDIR"
-mv "$PREFIX"* "$OUTDIR"
+mv "${PREFIX}"*.pdf "$OUTDIR"
+mv "${PREFIX}"*.svg "$OUTDIR"
 
 touch "$SENTINEL"
