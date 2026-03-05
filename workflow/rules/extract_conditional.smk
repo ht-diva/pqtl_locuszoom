@@ -24,5 +24,6 @@ rule index_data:
         """
         source /exchange/healthds/singularity_functions
         bgzip {input.data} -o {output.bgzip}
+        sleep 30
         tabix -s 1 -b 2 -e 2 {output.bgzip}
         """
