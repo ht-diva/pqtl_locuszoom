@@ -42,7 +42,7 @@ rerun:
 
 unlock:
 	source $(CONDA_ENV_DIR)/activate $(CONDA_ENV_NAME) && \
-	snakemake --unlock --snakefile workflow/Snakefile.smk 
+	snakemake --unlock --snakefile workflow/Snakefile
 
 dockerfile_:
 	source $(CONDA_ENV_DIR)/activate $(CONDA_ENV_NAME) && \
