@@ -6,6 +6,9 @@ rule compute_ld:
         locus = lambda wildcards: get_locus(wildcards.locuseq),
         lead  = lambda wildcards: get_snp(wildcards.locuseq),
         bfile = config["genotype"],
+        buffer = config.get("options").get("buffer"),
+        ldwind = config.get("options").get("ld_window"),
+        ldwind_r2 = config.get("options").get("ld_window_r2"),
     resources:
         runtime=lambda wc, attempt: 120 + attempt * 60,
     script:

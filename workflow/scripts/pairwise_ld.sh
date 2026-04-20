@@ -5,9 +5,9 @@ LD="${snakemake_output[ld]}"
 GENOTYPE="${snakemake_params[bfile]}"
 LOCUS="${snakemake_params[locus]}"
 LEAD="${snakemake_params[lead]}"
-TAIL=100000
-WINDOW=99999
-R2=0
+TAIL="${snakemake_params[buffer]}"
+WINDOW="${snakemake_params[ldwind]}"
+R2="${snakemake_params[ldwind_r2]}"
 THREADS=8
 MEM=16000
 
