@@ -63,7 +63,6 @@ eval $CMD | \
             --start $beg_ext \
             --end $end_ext \
             --build "$BUILD" \
-            --svg  \
             --ld "$LD" \
             --ld-measure "$MEASURE" \
             --plotonly  \
