@@ -5,7 +5,7 @@ rule compute_ld:
     params:
         locus = lambda wildcards: get_locus(wildcards.locuseq),
         lead  = lambda wildcards: get_snp(wildcards.locuseq),
-        bfile = config["genotype"],
+        bfile = lambda wildcards: get_geno(wildcards.locuseq),
         buffer = config.get("options").get("buffer"),
         ldwind = config.get("options").get("ld_window"),
         ldwind_r2 = config.get("options").get("ld_window_r2"),

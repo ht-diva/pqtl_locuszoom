@@ -33,7 +33,7 @@ beg_ext=$((beg - "$TAIL"))
 end_ext=$((end + "$TAIL"))
 
 plink   \
-  --bfile  "$GENOTYPE""$chr"  \
+  --bfile  "$GENOTYPE"  \
   --keep-allele-order \
   --ld-snp "$LEAD" \
   --chr "$chr" --from-bp "$beg_ext" --to-bp "$end_ext" \

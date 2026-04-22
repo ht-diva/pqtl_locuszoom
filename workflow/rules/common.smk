@@ -48,3 +48,23 @@ def get_rds(wildcards):
     locus = my_lb.loc[wildcards, "org_locus"]
     rds_path = f"cojo/{seqid}/conditional_data_{locus}.rds"
     return str(Path(config.get("path_rds"), rds_path))
+
+
+STUDY_GENOFILE = {
+    "Believe": "{chrom}_qced_new_id_alleles",
+    "Meta_Interval": "impute_recoded_selected_sample_filter_hq_var_new_id_alleles_{chrom}",
+}
+
+
+def get_geno(wildcards):
+    chrom = my_lb.loc[wildcards, "chr"]
+    study = config.get("run").get("study")
+
+    try:
+        info = STUDY_GENOFILE[study]
+    except KeyError:
+        raise ValueError(f"Unsupported study: {study}")
+
+    file_name = info.format(chrom=chrom)
+    return str(Path(config["genotype"]) / file_name)
+
