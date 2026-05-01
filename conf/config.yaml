@@ -1,17 +1,24 @@
-path_gwas: "/exchange/healthds/pQTL/results/META_CHRIS_INTERVAL/qced_sumstats_digits_not_flipped_filtered/output"
-genotype: "/scratch/giulia.pontali/genomics_QC_pipeline/results_scratch/bed/qc_recoded_harmonised/impute_recoded_selected_sample_filter_hq_var_new_id_alleles_"
+#path_gwas: "/exchange/healthds/pQTL/results/META_CHRIS_INTERVAL/qced_sumstats_digits_not_flipped_filtered/output"
+path_gwas: "/exchange/healthds/pQTL/BELIEVE/harmonized_gwas/"
+genotype: "/scratch/giulia.pontali/multiallelic_test/genomics_QC_pipeline/results/bed/qc_harmonised"
+#genotype: "/scratch/giulia.pontali/genomics_QC_pipeline/results_scratch/bed/qc_recoded_harmonised/impute_recoded_selected_sample_filter_hq_var_new_id_alleles_"
 path_rds: "/scratch/dariush.ghasemi/projects/pqtl_conditional/results/meta_correct_sdy"
-lb_file: "conf/KNG1_cojo.csv"
-path_out: "results/kng1_commun"
+header:  "conf/header.txt" 
+lb_file: "conf/believe_apoe.csv"
+path_out: "results/believe_apoe"
 
 options:
     show_recomb: TRUE
-    extn_window: 0
+    extn_window: 100000
+    buffer: 100000 # expanding region to compute LD
+    ld_window: 99999
+    ld_window_r2: 0 
     ld_measure: rsquare
-    build: hg19 # for Meta_Interval, hg38 for Believe
+    build: hg38 # hg19 for Meta_Interval, hg38 for Believe
     plab: MLOG10P
     snplab: SNPID
 
 run:
-    conditional_plot: True
-    study: Meta_Interval  # or Believe
+    conditional_plot: False
+    #study: Meta_Interval
+    study: Believe
