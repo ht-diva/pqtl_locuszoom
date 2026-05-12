@@ -32,6 +32,11 @@ out_ld=$(echo "$LD" | sed 's/.ld$//')
 beg_ext=$((beg - "$TAIL"))
 end_ext=$((end + "$TAIL"))
 
+# make sure beg_ext is not negative
+if [ $beg_ext -lt 0 ]; then
+    beg_ext=0
+fi
+
 plink   \
   --bfile  "$GENOTYPE"  \
   --keep-allele-order \
