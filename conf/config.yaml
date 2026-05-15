@@ -1,28 +1,28 @@
 run:
     conditional_plot: False
-    #study: Meta_Interval
-    study: Believe
+    study: Meta_Interval
+    #study: Believe
 
 # For Meta_Interval, use below paths:
-#path_gwas: "/exchange/healthds/pQTL/results/META_CHRIS_INTERVAL/qced_sumstats_digits_not_flipped_filtered/output"
-#genotype: "/scratch/giulia.pontali/genomics_QC_pipeline/results_scratch/bed/qc_recoded_harmonised/impute_recoded_selected_sample_filter_hq_var_new_id_alleles_"
+path_gwas: "/exchange/healthds/pQTL/results/META_CHRIS_INTERVAL/qced_sumstats_digits_not_flipped_filtered/output"
+genotype: "/scratch/giulia.pontali/genomics_QC_pipeline/results_scratch/bed/qc_recoded_harmonised"
 #path_rds: "/scratch/dariush.ghasemi/projects/pqtl_conditional/results/meta_correct_sdy"
 
 # For Believe, use below paths:
-path_gwas: "/exchange/healthds/pQTL/BELIEVE/harmonized_gwas/"
-genotype: "/scratch/giulia.pontali/multiallelic_test/genomics_QC_pipeline/results/bed/qc_harmonised"
+#path_gwas: "/exchange/healthds/pQTL/BELIEVE/harmonized_gwas/"
+#genotype: "/scratch/giulia.pontali/multiallelic_test/genomics_QC_pipeline/results/bed/qc_harmonised"
 
 header:  "conf/header.txt" 
-lb_file: "../pqtl_coloc/config/believe_loci_cis.csv"
-path_out: "results/believe_cis"
+lb_file: "conf/region/FN3K_locus.csv"
+path_out: "results/FN3K"
 
 options:
-    show_recomb: TRUE
+    show_recomb: FALSE
     extn_window: 100000
     buffer: 100000 # expanding region to compute LD
     ld_window: 99999
     ld_window_r2: 0 
     ld_measure: rsquare
-    build: hg38 # hg19 for Meta_Interval, hg38 for Believe
+    build: hg19 # hg19 for Meta_Interval, hg38 for Believe
     plab: MLOG10P
     snplab: SNPID
