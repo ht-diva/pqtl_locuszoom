@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name lzoom
-#SBATCH --output %j_tdark_meta.log
+#SBATCH --output %j_tdark_believe.log
 #SBATCH --partition cpuq
 #SBATCH --cpus-per-task 1
 #SBATCH --mem 4G

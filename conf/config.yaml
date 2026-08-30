@@ -1,20 +1,20 @@
 run:
     conditional_plot: False
-    study: Meta_Interval
-    #study: Believe
+    #study: Meta_Interval
+    study: Believe
 
 # For Meta_Interval, use below paths:
-path_gwas: "/exchange/healthds/pQTL/results/META_CHRIS_INTERVAL/qced_sumstats_digits_not_flipped_filtered/output"
-genotype: "/scratch/giulia.pontali/genomics_QC_pipeline/results_scratch/bed/qc_recoded_harmonised"
+#path_gwas: "/exchange/healthds/pQTL/results/META_CHRIS_INTERVAL/qced_sumstats_digits_not_flipped_filtered/output"
+#genotype: "/scratch/giulia.pontali/genomics_QC_pipeline/results_scratch/bed/qc_recoded_harmonised"
 #path_rds: "/scratch/dariush.ghasemi/projects/pqtl_conditional/results/meta_correct_sdy"
 
 # For Believe, use below paths:
-#path_gwas: "/exchange/healthds/pQTL/BELIEVE/harmonized_gwas/"
-#genotype: "/scratch/giulia.pontali/multiallelic_test/genomics_QC_pipeline/results/bed/qc_harmonised"
+path_gwas: "/exchange/healthds/pQTL/BELIEVE/harmonized_gwas/"
+genotype: "/scratch/giulia.pontali/multiallelic_test/genomics_QC_pipeline/results/bed/qc_harmonised"
 
 header:  "conf/header.txt" 
-lb_file: "conf/region/tdark_meta.csv"
-path_out: "results/tdark_meta"
+lb_file: "conf/region/tdark_believe.csv"
+path_out: "results/tdark_believe"
 
 options:
     show_recomb: FALSE
@@ -23,6 +23,6 @@ options:
     ld_window: 99999
     ld_window_r2: 0 
     ld_measure: rsquare
-    build: hg19 # hg19 for Meta_Interval, hg38 for Believe
+    build: hg38 # hg19 for Meta_Interval, hg38 for Believe
     plab: MLOG10P
     snplab: SNPID
