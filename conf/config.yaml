@@ -13,8 +13,8 @@ genotype: "/scratch/giulia.pontali/genomics_QC_pipeline/results_scratch/bed/qc_r
 #genotype: "/scratch/giulia.pontali/multiallelic_test/genomics_QC_pipeline/results/bed/qc_harmonised"
 
 header:  "conf/header.txt" 
-lb_file: "conf/region/FN3K_locus.csv"
-path_out: "results/FN3K"
+lb_file: "conf/region/tdark_meta.csv"
+path_out: "results/tdark_meta"
 
 options:
     show_recomb: FALSE
