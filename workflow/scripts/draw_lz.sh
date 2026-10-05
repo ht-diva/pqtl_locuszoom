@@ -42,9 +42,9 @@ echo "Expanded region: $region"
 echo "Target SNP: $target"
 
 # specify which command to use for different study
-if [ "$STUDY" = "Believe" ]; then
+if [ "$STUDY" = "Believe" ] || [ "$STUDY" = "Interval" ]; then
     CMD="cat $HEADER <(tabix $GWAS $region)"
-elif [ "$STUDY" = "Meta_Interval" ]; then
+elif [ "$STUDY" = "Meta" ]; then
     CMD="tabix $GWAS $region -h"
 else
     echo "ERROR: Unknown study $STUDY " >&2 

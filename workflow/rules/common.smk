@@ -30,7 +30,8 @@ def ws_path(file_path):
 
 STUDY_SUFFIX = {
     "Believe": ".gz",
-    "Meta_Interval": ".bgz",
+    "Meta": ".bgz",
+    "Interval": ".gz",
 }
 
 def get_gwas(wildcards):
@@ -52,7 +53,8 @@ def get_rds(wildcards):
 
 STUDY_GENOFILE = {
     "Believe": "{chrom}_qced_new_id_alleles",
-    "Meta_Interval": "impute_recoded_selected_sample_filter_hq_var_new_id_alleles_{chrom}",
+    "Meta": "impute_recoded_selected_sample_filter_hq_var_new_id_alleles_{chrom}",
+    "Interval": "impute_recoded_selected_sample_filter_hq_var_new_id_alleles_{chrom}",
 }
 
 
