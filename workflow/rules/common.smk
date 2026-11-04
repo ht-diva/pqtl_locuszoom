@@ -40,7 +40,8 @@ def get_gwas(wildcards):
         suffix = STUDY_SUFFIX[config["run"]["study"]]
     except KeyError:
         raise ValueError(f"Unsupported study: {config.get('run').get('study')}")
-    file_path = f"{seqid}/{seqid}.gwaslab.tsv{suffix}"
+    #file_path = f"{seqid}/{seqid}.gwaslab.tsv{suffix}"
+    file_path = f"bgeno_assoc_phen_{seqid}_res/bgeno_assoc_phen_{seqid}_res.gwaslab.tsv{suffix}"
     return str(Path(config.get("path_gwas"), file_path))
 
 # funtion creating the path toward conditional RDS file

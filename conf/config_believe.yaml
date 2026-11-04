@@ -3,10 +3,10 @@ run:
     study: Believe
 
 
-path_gwas: "/exchange/healthds/pQTL/BELIEVE/harmonized_gwas/"
+path_gwas: "/exchange/healthds/pQTL/BELIEVE/harmonized_gwas_bgen/"
 genotype: "/scratch/giulia.pontali/multiallelic_test/genomics_QC_pipeline/results/bed/qc_harmonised"
 header:  "conf/header_believe.txt" 
-lb_file: "conf/believe_cis_bgen.csv"
+lb_file: "../pqtl_susie/config/believe_test.csv"
 path_out: "results/believe_cis_bgen"
 
 
