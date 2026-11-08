@@ -67,6 +67,8 @@ eval $CMD | \
             --ld-measure "$MEASURE" \
             --plotonly  \
             showRecomb="$RECOMB" \
+            --svg  \
+            --no-date \
             --prefix "$PREFIX"
     
 # moving plots to the output directory
